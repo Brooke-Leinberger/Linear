@@ -148,9 +148,14 @@ int test_matricies()
 	assert( compare_matricies(three_by_three, identity) == 1, "Expected matricies to be equal" ) ? passcount++ : failcount++;
 	assert( compare_matricies(identity, identity) == -1, "Expected matricies to be equal references" ) ? passcount++ : failcount++;
 
+	scale_matrix(identity, 2, identity); //scale identity matrix by 2, and store it in the same matrix
+	edit_location(three_by_three, 0, 0, 2.0);
+	edit_location(three_by_three, 1, 1, 2.0);
+	edit_location(three_by_three, 2, 2, 2.0);
+	assert( compare_matricies(three_by_three, identity) == 1, "Expected matricies to be equal" ) ? passcount++ : failcount++;
+
+
 	free_matrix(identity);
-
-
 
 	vector *expected = NULL, *actual = NULL;
 	create_matrix(3, 3, three_by_three);

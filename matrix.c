@@ -16,9 +16,7 @@ dmatrix* create_matrix(int rows, int cols, dmatrix* dest)
 		dest->rows = rows;
 		dest->cols = cols;
 		for(int i = 0; i < rows; i++)
-		{
 			dest->row_arr[i] = malloc(cols * sizeof(double));
-		}
 	}
 
 	else if(dest->rows != rows || dest->cols != cols)
@@ -168,13 +166,17 @@ dmatrix* scale_matrix(dmatrix* mat, double scale, dmatrix* dest)
 	if(!mat)
 		return NULL;
 
-	dmatrix* output = create_matrix(mat->rows, mat->cols, dest);
+	if(!dest)
+		dest = create_matrix(mat->rows, mat->cols, NULL);
+
+	else if(dest->rows != mat->rows || dest->cols != mat->cols)
+		return NULL;
 
 	for(int row = 0; row < mat->rows; row++)
 		for(int col = 0; col < mat->cols; col++)
-			output->row_arr[row][col] = mat->row_arr[row][col] * scale;
+			dest->row_arr[row][col] = mat->row_arr[row][col] * scale;
 
-	return output;
+	return dest;
 }
 
 dmatrix* multiply_matricies(dmatrix* a, dmatrix* b, dmatrix* dest)

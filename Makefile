@@ -2,8 +2,8 @@ HEADERS = vector.h matrix.h unit_tests.h
 
 default: test
 
-prime:	vector.o main.o matrix.o $(HEADERS)
-	gcc -g -o linear unit_tests.o vector.o main.o matrix.o -lm
+prime:	vector.o matrix.o $(HEADERS)
+	ar -rc liblinear.a vector.o matrix.o
 
 test: vector.o main.o matrix.o unit_tests.o $(HEADERS)
 	gcc -g -o test unit_tests.o vector.o main.o matrix.o -lm
@@ -28,4 +28,4 @@ clean:
 	-rm -f unit_tests.o
 	-rm -f main.o
 	-rm -f test
-	-rm linear
+	-rm liblinear.a
