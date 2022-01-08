@@ -10,21 +10,23 @@ dmatrix* create_matrix(int rows, int cols, dmatrix* dest)
 		return NULL;
 
 	if(!dest)
+	{
 		dest = malloc(sizeof(dmatrix));
+		dest->row_arr = malloc(rows * sizeof(double*));
+		dest->rows = rows;
+		dest->cols = cols;
+		for(int i = 0; i < rows; i++)
+		{
+			dest->row_arr[i] = malloc(cols * sizeof(double));
+		}
+	}
 
 	else if(dest->rows != rows || dest->cols != cols)
-			return NULL;
+		return NULL;
 
-	dest->rows = rows;
-	dest->cols = cols;
-
-	dest->row_arr = malloc(rows * sizeof(double));
-
-	for(int i = 0; i < rows; i++)
-	{
-		dest->row_arr[i] = malloc(cols * sizeof(double));
-		memset(dest->row_arr[i], 0, cols * sizeof(double));
-	}
+	for(int row = 0; row < rows; row++)
+		for(int col = 0; col < cols; col++)
+			dest->row_arr[row][col] = 0;
 
 	return dest;
 }
@@ -137,12 +139,15 @@ int compare_matricies( dmatrix* a, dmatrix* b )
 		read_row(a, i, a_row);
 		read_row(b, i, b_row);
 		if( compare_vectors(a_row, b_row) == 0 )
+		{
+			free_vector(a_row);
+			free_vector(b_row);
 			return 0;
+		}
 	}
 
 	free_vector(a_row);
 	free_vector(b_row);
-
 	return 1;
 
 }
@@ -183,8 +188,8 @@ dmatrix* multiply_matricies(dmatrix* a, dmatrix* b, dmatrix* dest)
 	else if( dest->rows != a->rows || dest->cols != b->rows )
 		return NULL;
 
-	vector* row  = create_vector(a->rows, NULL, NULL);
-	vector* col  = create_vector(b->cols, NULL, NULL);
+	vector* row  = create_vector(a->cols, NULL, NULL);
+	vector* col  = create_vector(b->rows, NULL, NULL);
 
 	for(int row_index = 0; row_index < a->rows; row_index++)
 	{
@@ -195,6 +200,9 @@ dmatrix* multiply_matricies(dmatrix* a, dmatrix* b, dmatrix* dest)
 			dest->row_arr[row_index][col_index] = dot_product(row, col);
 		}
 	}
+
+	free_vector(row);
+	free_vector(col);
 
 	return dest;
 }

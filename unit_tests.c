@@ -153,8 +153,8 @@ int test_matricies()
 
 
 	vector *expected = NULL, *actual = NULL;
-	expected = create_vector(3, NULL, NULL);
 	create_matrix(3, 3, three_by_three);
+	expected = create_vector(3, NULL, NULL);
 
 	for(int i = 0; i < 9; i++)
 		edit_location(three_by_three, i/3, i%3, i+1);
@@ -162,16 +162,51 @@ int test_matricies()
 	expected->elements[0] = 1;
 	expected->elements[1] = 2;
 	expected->elements[2] = 3;
-	expected = create_vector(3, NULL, NULL);
 	actual = read_row(three_by_three, 0, NULL);
-	assert( compare_vectors(actual, expected) == 0, "Expected first row to contain <1,2,3>" ) ? passcount++ : failcount++;
+	assert( compare_vectors(actual, expected) == 1, "Expected first row to contain <1,2,3>" ) ? passcount++ : failcount++;
 
 	expected->elements[0] = 1;
 	expected->elements[1] = 4;
 	expected->elements[2] = 7;
-	create_vector(3, NULL, expected);
-	actual = read_col(three_by_three, 0, actual);
-	assert( compare_vectors(actual, expected) == 0, "Expected first row to contain <1,4,7>" ) ? passcount++ : failcount++;
+	read_col(three_by_three, 0, actual);
+	assert( compare_vectors(actual, expected) == 1, "Expected first column to contain <1,4,7>" ) ? passcount++ : failcount++;
+
+	//Freeing
+	free_vector(actual);
+	free_vector(expected);
+	free_matrix(three_by_three);
+
+	dmatrix* two_by_three = create_matrix(2, 3, NULL);
+	dmatrix* three_by_two = create_matrix(3, 2, NULL);
+
+	for(int i = 0; i < 6; i++)
+	{
+		edit_location(two_by_three, i/3, i%3, i+1);
+		edit_location(three_by_two, i/2, i%2, i+7);
+	}
+
+	dmatrix* result = multiply_matricies(two_by_three, three_by_two, NULL);
+
+	assert( result->rows == 2, "Expected result to have 2 rows" ) ? passcount++ : failcount++;
+	assert( result->cols == 2, "Expected result to have 2 columns" ) ? passcount++ : failcount++;
+	expected = create_vector(2, NULL, NULL);
+	actual = create_vector(2, NULL, NULL);
+	expected->elements[0] = 58;
+	expected->elements[1] = 64;
+	read_row(result, 0, actual);
+	assert( compare_vectors(actual, expected) == 1, "Expected first row to contain <58, 64>" ) ? passcount++ : failcount++;
+	expected->elements[0] = 139;
+	expected->elements[1] = 154;
+	read_row(result, 1, actual);
+	assert( compare_vectors(actual, expected) == 1, "Expected first row to contain <139, 154>" ) ? passcount++ : failcount++;
+
+	//Freeing
+	free_vector(actual);
+	free_vector(expected);
+	free_matrix(two_by_three);
+	free_matrix(three_by_two);
+	free_matrix(result);
+
 
 
 	printf("%d passed\n%d failed\n", passcount, failcount);
