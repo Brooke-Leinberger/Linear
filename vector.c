@@ -21,28 +21,26 @@ vector* create_vector( int count, double* elements, vector* dest )
 	if( count < 1 )
 		return NULL;
 
-	vector* vec;
-
 	if( !dest )
-		vec = malloc(sizeof(vector));
-	else
 	{
-		if(dest->count != count)
-			return NULL;
-		vec = dest;
+		dest = malloc(sizeof(vector));
+		dest->count = count;
+		dest->elements = malloc(count * sizeof(double));
 	}
 
-	vec->count = count;
-	vec->elements = malloc(count * sizeof(double));
+	else if(dest->count != count)
+			return NULL;
 
 	if( elements )
 		for( int i = 0; i < count; i++ )
-			vec->elements[i] = elements[i];
+			dest->elements[i] = elements[i];
 
 	else
-		memset(vec->elements, 0, count * sizeof(double));
+		for( int i = 0; i < count; i++ )
+			dest->elements[i] = 0;
 
-	return vec;
+
+	return dest;
 }
 
 /*Frees a given vector vec
@@ -72,6 +70,26 @@ double* read_vector( vector*  vec )
 		arr[i] = vec->elements[i];
 
 	return arr;
+}
+
+/*Compares two vectors
+  Returns  1 for equal vectors
+  Returns  0 for unequal vectors
+  Returns  0 for NULL vector inputs
+  Returns -1 for equal references*/
+int compare_vectors( vector* a, vector* b)
+{
+	if( !a || !b || a->count != b->count )
+		return 0;
+
+	if( a == b )
+		return -1;
+
+	for(int i = 0; i < a->count; i++)
+		if( a->elements[i] != b->elements[i] )
+			return 0;
+
+	return 1;
 }
 
 /*Returns a pointer to a copy of a given vector

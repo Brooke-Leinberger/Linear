@@ -7,5 +7,6 @@
 int main()
 {
 	//if(!strcmp(argv[0], "test"))
-		test();
+		test_vectors();
+		test_matricies();
 }

@@ -1,6 +1,6 @@
 HEADERS = vector.h matrix.h unit_tests.h
 
-default: prime
+default: test
 
 prime:	vector.o main.o matrix.o $(HEADERS)
 	gcc -g -o linear unit_tests.o vector.o main.o matrix.o -lm
@@ -24,6 +24,8 @@ matrix.o: matrix.c $(HEADERS)
 
 clean:
 	-rm -f vector.o
+	-rm -f matrix.o
+	-rm -f unit_tests.o
 	-rm -f main.o
 	-rm -f test
 	-rm linear

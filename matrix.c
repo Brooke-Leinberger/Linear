@@ -6,29 +6,27 @@
 
 dmatrix* create_matrix(int rows, int cols, dmatrix* dest)
 {
-	dmatrix* mat;
+	if(rows < 1 || cols < 1)
+		return NULL;
 
 	if(!dest)
-		mat = malloc(sizeof(dmatrix));
-	else
-	{
-		if(dest->rows != rows || dest->cols != cols)
+		dest = malloc(sizeof(dmatrix));
+
+	else if(dest->rows != rows || dest->cols != cols)
 			return NULL;
-		mat = dest;
-	}
 
-	mat->rows = rows;
-	mat->cols = cols;
+	dest->rows = rows;
+	dest->cols = cols;
 
-	mat->row_arr = malloc(rows * sizeof(double));
+	dest->row_arr = malloc(rows * sizeof(double));
 
 	for(int i = 0; i < rows; i++)
 	{
-		mat->row_arr[i] = malloc(cols * sizeof(double));
-		memset(mat->row_arr[i], 0, cols * sizeof(double));
+		dest->row_arr[i] = malloc(cols * sizeof(double));
+		memset(dest->row_arr[i], 0, cols * sizeof(double));
 	}
 
-	return mat;
+	return dest;
 }
 
 int free_matrix(dmatrix* mat)
@@ -53,16 +51,16 @@ double* read_location(dmatrix* mat, int row, int col)
 	if(col >= mat->cols || col < 0) //cols in bound
 		return NULL;
 
-	return &((mat->row_arr[row])[col]);
+	return &(mat->row_arr[row][col]);
 }
 
 int edit_location(dmatrix* mat, int row, int col, double val)
 {
-	double* val_ptr;
-	if( !mat || !(val_ptr = read_location(mat, row, col)) )
+	double* val_ptr = read_location(mat, row, col);
+	if( !val_ptr )
 		return 0;
 
-	*val_ptr = val;
+	mat->row_arr[row][col] = val;
 	return 1;
 }
 
@@ -86,7 +84,7 @@ vector* read_col(dmatrix* mat, int col, vector* dest)
 	double* column = malloc(mat->rows * sizeof(double));
 
 	for(int i = 0; i < mat->rows; i++)
-		column[i] = (mat->row_arr[i])[col];
+		column[i] = mat->row_arr[i][col];
 
 	vector* vec = create_vector(mat->rows, column, dest);
 	free(column);
@@ -123,6 +121,43 @@ int write_col( dmatrix* mat, int col, vector* arr )
 
 }
 
+int compare_matricies( dmatrix* a, dmatrix* b )
+{
+	if( !a || !b || a->rows != b->rows || a->cols != b->cols )
+		return 0;
+
+	if( a == b )
+		return -1;
+
+	vector* a_row = create_vector(a->cols, NULL, NULL);
+	vector* b_row = create_vector(b->cols, NULL, NULL);
+
+	for(int i = 0; i < a->rows; i++)
+	{
+		read_row(a, i, a_row);
+		read_row(b, i, b_row);
+		if( compare_vectors(a_row, b_row) == 0 )
+			return 0;
+	}
+
+	free_vector(a_row);
+	free_vector(b_row);
+
+	return 1;
+
+}
+
+dmatrix* identity_matrix(int rows, int cols, dmatrix* dest)
+{
+	dest = create_matrix(rows, cols, dest);
+	for(int i = 0; i < rows && i < cols; i++)
+		edit_location(dest, i, i, 1.0);
+
+	return dest;
+}
+
+
+
 dmatrix* scale_matrix(dmatrix* mat, double scale, dmatrix* dest)
 {
 	if(!mat)
@@ -136,12 +171,18 @@ dmatrix* scale_matrix(dmatrix* mat, double scale, dmatrix* dest)
 
 	return output;
 }
+
 dmatrix* multiply_matricies(dmatrix* a, dmatrix* b, dmatrix* dest)
 {
-	if(!a || !b)
+	if(!a || !b || a->cols != b->rows)
 		return NULL;
 
-	dmatrix* mat = create_matrix(a->rows, b->cols, dest);
+	if( !dest )
+		dest = create_matrix(a->rows, b->cols, NULL);
+
+	else if( dest->rows != a->rows || dest->cols != b->rows )
+		return NULL;
+
 	vector* row  = create_vector(a->rows, NULL, NULL);
 	vector* col  = create_vector(b->cols, NULL, NULL);
 
@@ -151,9 +192,9 @@ dmatrix* multiply_matricies(dmatrix* a, dmatrix* b, dmatrix* dest)
 		{
 			read_row(a, row_index, row);
 			read_col(b, col_index, col);
-			mat->row_arr[row_index][col_index] = dot_product(row, col);
+			dest->row_arr[row_index][col_index] = dot_product(row, col);
 		}
 	}
 
-	return mat;
+	return dest;
 }

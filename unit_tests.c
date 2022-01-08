@@ -23,7 +23,7 @@ int assert( int test_result, char error_format[], ... ) {
 }
 
 
-int test()
+int test_vectors()
 {
 	int passcount = 0, failcount = 0;
 
@@ -31,59 +31,77 @@ int test()
 	//Vectors
 
 	//expected behavior
-	double* coord = malloc(3 * sizeof(double));
-	vector* x = NULL;
-	vector* y = NULL;
-	vector* z = NULL;
+	vector* comp = create_vector(3, NULL, NULL);
+	vector* w = create_vector(3, NULL, NULL);
+	vector* x = create_vector(3, NULL, NULL);
+	x->elements[0] = 1;
+	vector* y = create_vector(3, NULL, NULL);
+	y->elements[1] = 1;
+	vector* z = create_vector(3, NULL, NULL);
+	z->elements[2] = 1;
 
-	coord[0] = 1;
-	coord[1] = 0;
-	coord[2] = 0;
-
-	x = create_vector(3, coord, NULL);
+	comp->elements[0] = 1;
 
 	assert(x != NULL, "Expected x to not be NULL because a vector was created") ? passcount++ : failcount++;
 	assert(x->elements[0] == 1, "Expected X component (0th element) to equal 1") ? passcount++ : failcount++;
 	assert(x->elements[1] == 0, "Expected Y component (1st element) to equal 0") ? passcount++ : failcount++;
 	assert(x->elements[2] == 0, "Expected Z component (2nd element) to equal 0") ? passcount++ : failcount++;
+	assert(compare_vectors(x, comp) == 1, "Expected x to equal comp") ? passcount++ : failcount++;
+	assert(compare_vectors(x, y) == 0, "Expected x to not equal y") ? passcount++ : failcount++;
+	assert(compare_vectors(x, x) == -1, "Expected address of x to equal address of x") ? passcount++ : failcount++;
 
-	coord[0] = 0;
-	coord[1] = 1;
-	coord[2] = 0;
-
-	y = create_vector(3, coord, NULL);
+	comp->elements[0] = 0;
+	comp->elements[1] = 1;
 
 	assert(y != NULL, "Expected y to not be NULL because a vector was created") ? passcount++ : failcount++;
 	assert(y->elements[0] == 0, "Expected X component (0th element) to equal 0") ? passcount++ : failcount++;
 	assert(y->elements[1] == 1, "Expected Y component (1st element) to equal 1") ? passcount++ : failcount++;
 	assert(y->elements[2] == 0, "Expected Z component (2nd element) to equal 0") ? passcount++ : failcount++;
+	assert(compare_vectors(y, comp) == 1, "Expected y to equal comp") ? passcount++ : failcount++;
+	assert(compare_vectors(y, x) == 0, "Expected y to not equal x") ? passcount++ : failcount++;
+	assert(compare_vectors(y, y) == -1, "Expected address of y to equal address of y") ? passcount++ : failcount++;
+
+	comp->elements[1] = 0;
+	comp->elements[2] = 1;
 
 	assert(dot_product(x,y) == 0, "Expected dot product of x and y to be 0, since they are perpendicular") ? passcount++ : failcount++;
 	assert(dot_product(x,x) == 1, "Expected dot product of x and x to be 1, since 1 = 1^2") ? passcount++ : failcount++;
 
-	z = cross_product(x,y,NULL);
+	cross_product(x, y, z);
 
 	assert(z != NULL, "Expected z to not be NULL because a vector was created") ? passcount++ : failcount++;
 	assert(z->elements[0] == 0, "Expected X component (0th element) to equal 0") ? passcount++ : failcount++;
 	assert(z->elements[1] == 0, "Expected Y component (1st element) to equal 0") ? passcount++ : failcount++;
 	assert(z->elements[2] == 1, "Expected Z component (2nd element) to equal 1") ? passcount++ : failcount++;
+	assert(compare_vectors(z, comp) == 1, "Expected z to equal comp") ? passcount++ : failcount++;
+	assert(compare_vectors(z, x) == 0, "Expected z to not equal x") ? passcount++ : failcount++;
+	assert(compare_vectors(z, z) == -1, "Expected address of z to equal address of z") ? passcount++ : failcount++;
 
-	vector* w = create_vector(3, NULL, NULL);
+	comp->elements[2] = 0;
+
 	assert(w != NULL, "Expected z to not be NULL because a vector was created") ? passcount++ : failcount++;
 	assert(w->elements[0] == 0, "Expected X component (0th element) to equal 0") ? passcount++ : failcount++;
 	assert(w->elements[1] == 0, "Expected Y component (1st element) to equal 0") ? passcount++ : failcount++;
 	assert(w->elements[2] == 0, "Expected Z component (2nd element) to equal 0") ? passcount++ : failcount++;
+	assert(compare_vectors(w, comp) == 1, "Expected w to equal comp") ? passcount++ : failcount++;
+	assert(compare_vectors(w, y) == 0, "Expected w to not equal y") ? passcount++ : failcount++;
+	assert(compare_vectors(w, w) == -1, "Expected address of w to equal address of w") ? passcount++ : failcount++;
 
-	coord[0] = 1;
-	coord[1] = 1;
-	coord[2] = 1;
+	comp->elements[0] = 1;
+	comp->elements[1] = 1;
+	comp->elements[2] = 1;
 
+	double* coord = read_vector(comp);
 	vector* v = create_vector(3, coord, w);
+
 	assert(v != NULL, "Expected z to not be NULL because a vector was created") ? passcount++ : failcount++;
-	assert(w == v, "Expected w to equal v because w was set as the dest argument") ? passcount++ : failcount++;
-	assert(w->elements[0] == 1, "Expected X component (0th element) to equal 1") ? passcount++ : failcount++;
-	assert(w->elements[1] == 1, "Expected Y component (1st element) to equal 1") ? passcount++ : failcount++;
-	assert(w->elements[2] == 1, "Expected Z component (2nd element) to equal 1") ? passcount++ : failcount++;
+	assert(v == w, "Expected w to equal v because w was set as the dest argument") ? passcount++ : failcount++;
+	assert(v->elements[0] == 1, "Expected X component (0th element) to equal 1") ? passcount++ : failcount++;
+	assert(v->elements[1] == 1, "Expected Y component (1st element) to equal 1") ? passcount++ : failcount++;
+	assert(v->elements[2] == 1, "Expected Z component (2nd element) to equal 1") ? passcount++ : failcount++;
+	assert(compare_vectors(v, comp) == 1, "Expected v to equal comp") ? passcount++ : failcount++;
+	assert(compare_vectors(v, y) == 0, "Expected v to not equal y") ? passcount++ : failcount++;
+	assert(compare_vectors(v, w) == -1, "Expected address of v to equal address of w") ? passcount++ : failcount++;
 
 	//idiot-proofing
 
@@ -91,15 +109,18 @@ int test()
 	coord[1] = 0;
 	coord[2] = 0;
 
-	x = create_vector(0, coord, NULL);
-	assert(x == NULL, "Expected x to be NULL because count was 0 (count<1)") ? passcount++ : failcount++;
+	vector* i;
 
-	x = create_vector(-2, coord, NULL);
-	assert(x == NULL, "Expected x to be NULL because count was -2 (count<1)") ? passcount++ : failcount++;
+	i = create_vector(0, coord, NULL);
+	assert(i == NULL, "Expected i to be NULL because count was 0 (count<1)") ? passcount++ : failcount++;
+
+	i = create_vector(-2, coord, NULL);
+	assert(i == NULL, "Expected i to be NULL because count was -2 (count<1)") ? passcount++ : failcount++;
 
 	assert(free_vector(NULL) == 0, "Expected free_vector to return zero because its input was NULL") ? passcount++ : failcount++;
 
 	//freeing
+	free_vector(comp);
 	free_vector(w);
 	free_vector(x);
 	free_vector(y);
@@ -107,6 +128,52 @@ int test()
 	free(coord);
 
 	printf("%d passed\n%d failed\n", passcount, failcount);
+	return 1;
+}
 
+int test_matricies()
+{
+	int passcount = 0, failcount = 0;
+	printf("Testing Matricies...\n");
+
+	dmatrix* identity = identity_matrix(3, 3, NULL);
+	dmatrix* three_by_three = create_matrix(3, 3, NULL);
+
+	assert( compare_matricies(three_by_three, identity) == 0, "Expected matricies to not be equal" ) ? passcount++ : failcount++;
+
+	edit_location(three_by_three, 0, 0, 1.0);
+	edit_location(three_by_three, 1, 1, 1.0);
+	edit_location(three_by_three, 2, 2, 1.0);
+
+	assert( compare_matricies(three_by_three, identity) == 1, "Expected matricies to be equal" ) ? passcount++ : failcount++;
+	assert( compare_matricies(identity, identity) == -1, "Expected matricies to be equal references" ) ? passcount++ : failcount++;
+
+	free_matrix(identity);
+
+
+
+	vector *expected = NULL, *actual = NULL;
+	expected = create_vector(3, NULL, NULL);
+	create_matrix(3, 3, three_by_three);
+
+	for(int i = 0; i < 9; i++)
+		edit_location(three_by_three, i/3, i%3, i+1);
+
+	expected->elements[0] = 1;
+	expected->elements[1] = 2;
+	expected->elements[2] = 3;
+	expected = create_vector(3, NULL, NULL);
+	actual = read_row(three_by_three, 0, NULL);
+	assert( compare_vectors(actual, expected) == 0, "Expected first row to contain <1,2,3>" ) ? passcount++ : failcount++;
+
+	expected->elements[0] = 1;
+	expected->elements[1] = 4;
+	expected->elements[2] = 7;
+	create_vector(3, NULL, expected);
+	actual = read_col(three_by_three, 0, actual);
+	assert( compare_vectors(actual, expected) == 0, "Expected first row to contain <1,4,7>" ) ? passcount++ : failcount++;
+
+
+	printf("%d passed\n%d failed\n", passcount, failcount);
 	return 1;
 }
