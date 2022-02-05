@@ -1,0 +1,230 @@
+#include <stdlib.h>
+#include <string.h>
+#include "matrix.h"
+#include "vector.h"
+
+matrix* create_matrix(int rows, int cols, matrix* dest)
+{
+	if(rows < 1 || cols < 1)
+		return NULL;
+
+	if(!dest)
+	{
+		dest = malloc(sizeof(matrix));
+		dest->row_arr = malloc(rows * sizeof(double*));
+		dest->rows = rows;
+		dest->cols = cols;
+		for(int i = 0; i < rows; i++)
+			dest->row_arr[i] = malloc(cols * sizeof(double));
+	}
+
+	else if(dest->rows != rows || dest->cols != cols)
+		return NULL;
+
+	for(int row = 0; row < rows; row++)
+		for(int col = 0; col < cols; col++)
+			dest->row_arr[row][col] = 0;
+
+	return dest;
+}
+
+int free_matrix(matrix* mat)
+{
+	if(!mat)
+		return 0;
+
+	for(int i = 0; i < mat->rows; i++)
+		free(mat->row_arr[i]);
+
+	free(mat->row_arr);
+	free(mat);
+	return 1;
+}
+
+double* read_location(matrix* mat, int row, int col)
+{
+	if(!mat) //mat is not null
+		return NULL;
+	if(row >= mat->rows || row < 0) //rows in bound
+		return NULL;
+	if(col >= mat->cols || col < 0) //cols in bound
+		return NULL;
+
+	return &(mat->row_arr[row][col]);
+}
+
+int edit_location(matrix* mat, int row, int col, double val)
+{
+	double* val_ptr = read_location(mat, row, col);
+	if( !val_ptr )
+		return 0;
+
+	mat->row_arr[row][col] = val;
+	return 1;
+}
+
+vector* read_row(matrix* mat, int row, vector* dest)
+{
+	if(!mat) //mat is not null
+		return NULL;
+	if(row >= mat->rows || row < 0) //rows in bound
+		return NULL;
+
+	return create_vector(mat->cols, mat->row_arr[row], dest);
+}
+
+vector* read_col(matrix* mat, int col, vector* dest)
+{
+	if(!mat) //mat is not null
+		return NULL;
+	if(col >= mat->cols || col < 0) //cols in bound
+		return NULL;
+
+	double* column = malloc(mat->rows * sizeof(double));
+
+	for(int i = 0; i < mat->rows; i++)
+		column[i] = mat->row_arr[i][col];
+
+	vector* vec = create_vector(mat->rows, column, dest);
+	free(column);
+	return vec;
+}
+
+int write_row( matrix* mat, int row, vector* source )
+{
+	if(!mat || !source) //mat is not null
+		return 0;
+	if(row >= mat->rows || row < 0) //rows in bound
+		return 0;
+	if(source->count != mat->cols) //vector is right size
+		return 0;
+
+	for(int i = 0; i < mat->cols; i++)
+		mat->row_arr[row][i] = source->elements[i];
+	return 1;
+}
+
+int write_col( matrix* mat, int col, vector* arr )
+{
+	if(!mat || !arr) //mat is not null
+		return 0;
+	if(col >= mat->cols || col < 0) //cols in bound
+		return 0;
+	if(arr->count != mat->rows) //vector is right size
+		return 0;
+
+	for(int i = 0; i < mat->rows; i++)
+		mat->row_arr[i][col] = arr->elements[i];
+
+	return 1;
+
+}
+
+int compare_matrices( matrix* a, matrix* b )
+{
+	if( !a || !b || a->rows != b->rows || a->cols != b->cols )
+		return 0;
+
+	if( a == b )
+		return -1;
+
+	vector* a_row = create_vector(a->cols, NULL, NULL);
+	vector* b_row = create_vector(b->cols, NULL, NULL);
+
+	for(int i = 0; i < a->rows; i++)
+	{
+		read_row(a, i, a_row);
+		read_row(b, i, b_row);
+		if( compare_vectors(a_row, b_row) == 0 )
+		{
+			free_vector(a_row);
+			free_vector(b_row);
+			return 0;
+		}
+	}
+
+	free_vector(a_row);
+	free_vector(b_row);
+	return 1;
+
+}
+
+matrix* identity_matrix(int rows, int cols, matrix* dest)
+{
+	dest = create_matrix(rows, cols, dest);
+	for(int i = 0; i < rows && i < cols; i++)
+		edit_location(dest, i, i, 1.0);
+
+	return dest;
+}
+
+
+
+matrix* scale_matrix(matrix* mat, double scale, matrix* dest)
+{
+	if(!mat)
+		return NULL;
+
+	if(!dest)
+		dest = create_matrix(mat->rows, mat->cols, NULL);
+
+	else if(dest->rows != mat->rows || dest->cols != mat->cols)
+		return NULL;
+
+	for(int row = 0; row < mat->rows; row++)
+		for(int col = 0; col < mat->cols; col++)
+			dest->row_arr[row][col] = mat->row_arr[row][col] * scale;
+
+	return dest;
+}
+
+matrix* multiply_matrices(matrix* a, matrix* b, matrix* dest)
+{
+	if(!a || !b || a->cols != b->rows)
+		return NULL;
+
+	if( !dest )
+		dest = create_matrix(a->rows, b->cols, NULL);
+
+	else if( dest->rows != a->rows || dest->cols != b->rows )
+		return NULL;
+
+	vector* row  = create_vector(a->cols, NULL, NULL);
+	vector* col  = create_vector(b->rows, NULL, NULL);
+
+	for(int row_index = 0; row_index < a->rows; row_index++)
+	{
+		for(int col_index = 0; col_index < b->cols; col_index++)
+		{
+			read_row(a, row_index, row);
+			read_col(b, col_index, col);
+			dest->row_arr[row_index][col_index] = dot_product(row, col);
+		}
+	}
+
+	free_vector(row);
+	free_vector(col);
+
+	return dest;
+}
+
+vector *multiply_vector_by_matrix(matrix *mat, vector *vec, vector *dest)
+{
+	if( !mat || !vec )
+		return NULL;
+
+	if( mat->cols != vec->count )
+		return NULL;
+
+	dest = create_vector(mat->rows, NULL, NULL);
+
+	vector *row = create_vector(mat->cols, NULL, NULL);
+	for(int i = 0; i < mat->rows; i++)
+	{
+		read_row(mat, i, row);
+		dest->elements[i] = dot_product(row, vec);
+	}
+    free_vector(vec);
+
+	return dest;
+}
