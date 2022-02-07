@@ -6,7 +6,7 @@
 # It is included in the main 'build.ninja'.
 
 # =============================================================================
-# Project: Linear2
+# Project: Linear
 # Configurations: Debug
 # =============================================================================
 # =============================================================================
@@ -41,7 +41,7 @@ rule C_EXECUTABLE_LINKER__test_Debug
 #############################################
 # Rule for compiling C files.
 
-rule C_COMPILER__Linear2_Debug
+rule C_COMPILER__Linear_Debug
   depfile = $DEP_FILE
   deps = gcc
   command = /usr/bin/cc $DEFINES $INCLUDES $FLAGS -MD -MT $out -MF $DEP_FILE -o $out -c $in
@@ -51,7 +51,7 @@ rule C_COMPILER__Linear2_Debug
 #############################################
 # Rule for linking C static library.
 
-rule C_STATIC_LIBRARY_LINKER__Linear2_Debug
+rule C_STATIC_LIBRARY_LINKER__Linear_Debug
   command = $PRE_LINK && /home/juno/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/213.6777.58/bin/cmake/linux/bin/cmake -E rm -f $TARGET_FILE && /usr/bin/ar qc $TARGET_FILE $LINK_FLAGS $in && /usr/bin/ranlib $TARGET_FILE && $POST_BUILD
   description = Linking C static library $TARGET_FILE
   restat = $RESTAT

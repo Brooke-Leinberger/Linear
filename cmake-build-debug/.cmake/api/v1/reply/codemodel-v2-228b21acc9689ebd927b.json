@@ -28,7 +28,7 @@
 					[
 						0
 					],
-					"name" : "Linear2",
+					"name" : "Linear",
 					"targetIndexes" : 
 					[
 						0,
@@ -40,9 +40,9 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "Linear2::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Linear2-Debug-1644020cffffe89cf51e.json",
-					"name" : "Linear2",
+					"id" : "Linear::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-Linear-Debug-494a06a2adf48c14a9e8.json",
+					"name" : "Linear",
 					"projectIndex" : 0
 				},
 				{

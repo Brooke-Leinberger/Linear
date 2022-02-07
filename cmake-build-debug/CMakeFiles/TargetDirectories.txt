@@ -1,4 +1,4 @@
 /home/juno/CLionProjects/Linear/cmake-build-debug/CMakeFiles/rebuild_cache.dir
 /home/juno/CLionProjects/Linear/cmake-build-debug/CMakeFiles/edit_cache.dir
 /home/juno/CLionProjects/Linear/cmake-build-debug/CMakeFiles/test.dir
-/home/juno/CLionProjects/Linear/cmake-build-debug/CMakeFiles/Linear2.dir
+/home/juno/CLionProjects/Linear/cmake-build-debug/CMakeFiles/Linear.dir

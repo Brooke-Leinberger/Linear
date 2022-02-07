@@ -159,7 +159,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc-ar-9"
+			"value" : "/usr/bin/gcc-ar-11"
 		},
 		{
 			"name" : "CMAKE_C_COMPILER_RANLIB",
@@ -175,7 +175,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "/usr/bin/gcc-ranlib-9"
+			"value" : "/usr/bin/gcc-ranlib-11"
 		},
 		{
 			"name" : "CMAKE_C_FLAGS",
@@ -691,7 +691,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "Linear2"
+			"value" : "Linear"
 		},
 		{
 			"name" : "CMAKE_RANLIB",
@@ -974,7 +974,7 @@
 			"value" : "FALSE"
 		},
 		{
-			"name" : "Linear2_BINARY_DIR",
+			"name" : "Linear_BINARY_DIR",
 			"properties" : 
 			[
 				{
@@ -986,7 +986,7 @@
 			"value" : "/home/juno/CLionProjects/Linear/cmake-build-debug"
 		},
 		{
-			"name" : "Linear2_IS_TOP_LEVEL",
+			"name" : "Linear_IS_TOP_LEVEL",
 			"properties" : 
 			[
 				{
@@ -998,7 +998,7 @@
 			"value" : "ON"
 		},
 		{
-			"name" : "Linear2_SOURCE_DIR",
+			"name" : "Linear_SOURCE_DIR",
 			"properties" : 
 			[
 				{

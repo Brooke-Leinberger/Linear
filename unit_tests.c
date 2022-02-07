@@ -25,6 +25,12 @@ int assert( int test_result, char error_format[], ... ) {
 }
 
 
+int approx(double a, double b, int precision)
+{
+    return abs(a-b) < pow(10, precision) ? 1 : 0;
+}
+
+
 int test_vectors()
 {
 	int pass_count = 0, fail_count = 0;
@@ -231,12 +237,19 @@ int test_matrices ()
 	return 1;
 }
 
+
+
+#define w elements[0]
+#define x elements[1]
+#define y elements[2]
+#define z elements[3]
+
 int test_quaternions () {
     int pass_count = 0, fail_count = 0;
     printf("Testing quaternions...\n");
 
     printf("----------  test blank_quaternion  ----------\n");
-    quaternion *quat = blank_quaternion(NULL);
+    vector *quat = blank_quaternion(NULL);
     assert(quat != NULL, "Expected quat to not be NULL") ? pass_count++ : fail_count++;
     assert(quat->w == 1, "Expected the real component to equal 1") ? pass_count++ : fail_count++;
     assert(quat->x == 0, "Expected the x component to equal 0") ? pass_count++ : fail_count++;
@@ -246,7 +259,7 @@ int test_quaternions () {
     //test blank vector with dest
     printf("----------  test blank_quaternion with dest  ----------\n");
     quat->w = 42;
-    quaternion *neo = blank_quaternion(quat);
+    vector *neo = blank_quaternion(quat);
     assert(quat == neo, "Expected quat to not be NULL") ? pass_count++ : fail_count++;
     assert(quat->w == 1, "Expected the real component to equal 1") ? pass_count++ : fail_count++;
     assert(quat->x == 0, "Expected the x component to equal 0") ? pass_count++ : fail_count++;
@@ -265,7 +278,7 @@ int test_quaternions () {
 
     //test compare_quaternions
     printf("----------  test compare_components  ----------\n");
-    quaternion *comp = blank_quaternion(NULL);
+    vector *comp = blank_quaternion(NULL);
     blank_quaternion(quat);
 
     assert(comp != quat, "Expected that quat and comp are distinct quaternions") ? pass_count++ : fail_count++;
@@ -316,7 +329,7 @@ int test_quaternions () {
     assert(magnitude_quaternion(quat) == 5, "Expected quat to have a magnitude of 5") ? pass_count++ : fail_count++;
     assert(magnitude_quaternion(comp) == 1, "Expected comp to have a magnitude of 1") ? pass_count++ : fail_count++;
     assert(dot_product(comp, quat) == 5, "Expected dot_product of comp and quat to equal 5") ? pass_count++ : fail_count++; //relies on dot_product working
-    assert(comp->x * 0.75 == comp->w, "Expected the ratio of components to be preserved") ? pass_count++ : fail_count++;
+    assert(approx(comp->x * 0.75, comp->w, -10), "Expected the ratio of components to be preserved") ? pass_count++ : fail_count++;
 
     free_quaternion(comp);
     free_quaternion(neo);

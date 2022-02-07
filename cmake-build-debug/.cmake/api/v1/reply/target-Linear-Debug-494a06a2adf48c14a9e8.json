@@ -3,7 +3,7 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "libLinear2.a"
+			"path" : "libLinear.a"
 		}
 	],
 	"backtrace" : 1,
@@ -59,9 +59,9 @@
 			]
 		}
 	],
-	"id" : "Linear2::@6890427a1f51a3e7e1df",
-	"name" : "Linear2",
-	"nameOnDisk" : "libLinear2.a",
+	"id" : "Linear::@6890427a1f51a3e7e1df",
+	"name" : "Linear",
+	"nameOnDisk" : "libLinear.a",
 	"paths" : 
 	{
 		"build" : ".",

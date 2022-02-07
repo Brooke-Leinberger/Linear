@@ -4,6 +4,11 @@
 #include <math.h>
 #include "vector.h"
 
+#define w elements[0]
+#define x elements[1]
+#define y elements[2]
+#define z elements[3]
+
 static double square(double n)
 {
     return n * n;
@@ -14,16 +19,10 @@ static double square(double n)
  * If dest is NULL, a new quaternion is allocated
  * If dest is not NULL, dest is overwritten
  */
-quaternion *blank_quaternion(quaternion *dest)
+vector *blank_quaternion(vector *dest)
 {
-    if( !dest )
-        dest = malloc(sizeof(quaternion));
-
+    dest = create_vector(4, NULL, dest);
     dest->w = 1;
-    dest->x = 0;
-    dest->y = 0;
-    dest->z = 0;
-
     return dest;
 }
 
@@ -33,14 +32,14 @@ quaternion *blank_quaternion(quaternion *dest)
  * If dest is NULL, a new quaternion is allocated
  * If dest is not NULL, dest is overwritten
  */
-quaternion *create_quaternion_components ( double w, double x, double y, double z, quaternion *dest )
+vector *create_quaternion_components ( double w_comp, double x_comp, double y_comp, double z_comp, vector *dest )
 {
     dest = blank_quaternion(dest);
 
-	dest->w = w;
-	dest->x = x;
-	dest->y = y;
-	dest->z = z;
+	dest->w = w_comp;
+	dest->x = x_comp;
+	dest->y = y_comp;
+	dest->z = z_comp;
 
 	return dest;
 }
@@ -51,7 +50,7 @@ quaternion *create_quaternion_components ( double w, double x, double y, double 
  * If dest is NULL, a new quaternion is allocated
  * If dest is not NULL, dest is overwritten
  */
-quaternion *create_quaternion_angle_axis ( double angle, vector *axis, quaternion *dest)
+vector *create_quaternion_angle_axis ( double angle, vector *axis, vector *dest)
 {
 	if( !axis )
 		return NULL;
@@ -77,7 +76,7 @@ quaternion *create_quaternion_angle_axis ( double angle, vector *axis, quaternio
  * If dest is NULL, the function simply returns quat
  * If dest is an equivalent pointer to quat, the function simply returns quat
  */
-quaternion *clone_quaternion(quaternion *quat, quaternion *dest)
+vector *clone_quaternion(vector *quat, vector *dest)
 {
 	if( !quat )
 		return NULL;
@@ -90,7 +89,7 @@ quaternion *clone_quaternion(quaternion *quat, quaternion *dest)
 }
 
 //Frees the quaternion
-int free_quaternion (quaternion *quat)
+int free_quaternion (vector *quat)
 {
 	if( !quat )
 		return 0;
@@ -99,7 +98,7 @@ int free_quaternion (quaternion *quat)
 	return 1;
 }
 
-int compare_quaternions (quaternion *a, quaternion *b)
+int compare_quaternions (vector *a, vector *b)
 {
     if( !a || !b )
         return 0; //return 0 for failure (may change to -2 in future)
@@ -120,7 +119,7 @@ int compare_quaternions (quaternion *a, quaternion *b)
  * Returns a freshly allocated quaternion if dest is NULL
  * If dest is not NULL, dest is overwritten
  */
-quaternion *inverse_quaternion(quaternion *quat, quaternion *dest)
+vector *inverse_quaternion(vector *quat, vector *dest)
 {
     if( !quat )
         return NULL;
@@ -139,7 +138,7 @@ quaternion *inverse_quaternion(quaternion *quat, quaternion *dest)
  * If dest is NULL, a new quaternion is allocated
  * If dest is not NULL, dest is overwritten
  */
-quaternion *vector_to_quaternion (vector *vec, quaternion *dest)
+vector *vector_to_quaternion (vector *vec, vector *dest)
 {
 	if( !vec )
 		return NULL;
@@ -148,7 +147,7 @@ quaternion *vector_to_quaternion (vector *vec, quaternion *dest)
 	return dest;
 }
 
-vector *quaternion_to_vector (quaternion *quat, vector *dest)
+vector *quaternion_to_vector (vector *quat, vector *dest)
 {
 	if( !quat )
 		return NULL;
@@ -169,7 +168,7 @@ vector *quaternion_to_vector (quaternion *quat, vector *dest)
  * Domain of returned value ranges from 0 to +infinity
  * Returns -1 on failure
  */
-double magnitude_quaternion (quaternion *quat)
+double magnitude_quaternion (vector *quat)
 {
 	if( !quat )
 		return -1;
@@ -183,7 +182,7 @@ double magnitude_quaternion (quaternion *quat)
  * If dest is quat, quat will be normalized without allocating a new quaternion, and returned
  * if dest is neither, dest will be overwritten with quat, then normalized and returned
  */
-quaternion *normalize_quaternion (quaternion *quat, quaternion *dest)
+vector *normalize_quaternion (vector *quat, vector *dest)
 {
 	double mag = magnitude_quaternion(quat);
 
@@ -204,7 +203,7 @@ quaternion *normalize_quaternion (quaternion *quat, quaternion *dest)
 /*
  * Returns the result of two
  */
-quaternion *multiply_quaternions (quaternion* left, quaternion* right, quaternion* dest)
+vector *multiply_quaternions (vector* left, vector* right, vector* dest)
 {
 	if( !left || !right )
 		return NULL;
@@ -219,18 +218,18 @@ quaternion *multiply_quaternions (quaternion* left, quaternion* right, quaternio
     return dest;
 }
 
-vector *rotate_vector (quaternion *quat, vector *vec, vector *dest)
+vector *rotate_vector (vector *quat, vector *vec, vector *dest)
 {
     //quat * vec * inv_quat
     if( !quat || !vec )
         return NULL;
 
-	quaternion *inverse = inverse_quaternion(quat, inverse); //assign inverse
-	quaternion *vec_quat = vector_to_quaternion(vec, NULL); //create quaternion from vec
+	vector *inverse = inverse_quaternion(quat, inverse); //assign inverse
+	vector *vec_quat = vector_to_quaternion(vec, NULL); //create quaternion from vec
     normalize_quaternion(vec_quat, vec_quat); //normalize
 
-	quaternion *inter  = multiply_quaternions(quat, vec_quat, NULL); //perform first multiplication
-	quaternion *result = multiply_quaternions(inter, inverse, NULL); //perform second multiplication
+	vector *inter  = multiply_quaternions(quat, vec_quat, NULL); //perform first multiplication
+	vector *result = multiply_quaternions(inter, inverse, NULL); //perform second multiplication
 	dest = quaternion_to_vector(result, dest); //isolate vector
 
     //Free intermediate variables
@@ -242,7 +241,7 @@ vector *rotate_vector (quaternion *quat, vector *vec, vector *dest)
 	return dest;
 }
 
-matrix *quaternion_to_matrix(quaternion *quat, matrix *dest)
+matrix *quaternion_to_matrix(vector *quat, matrix *dest)
 {
 	if( !quat )
 		return NULL;
