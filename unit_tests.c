@@ -239,10 +239,10 @@ int test_matrices ()
 
 
 
-#define w elements[0]
-#define x elements[1]
-#define y elements[2]
-#define z elements[3]
+#define x elements[0]
+#define y elements[1]
+#define z elements[2]
+#define w elements[3]
 
 int test_quaternions () {
     int pass_count = 0, fail_count = 0;
@@ -250,6 +250,7 @@ int test_quaternions () {
 
     printf("----------  test blank_quaternion  ----------\n");
     vector *quat = blank_quaternion(NULL);
+    assert(quat->count == 4, "Expected quat to not be NULL") ? pass_count++ : fail_count++;
     assert(quat != NULL, "Expected quat to not be NULL") ? pass_count++ : fail_count++;
     assert(quat->w == 1, "Expected the real component to equal 1") ? pass_count++ : fail_count++;
     assert(quat->x == 0, "Expected the x component to equal 0") ? pass_count++ : fail_count++;
@@ -282,58 +283,62 @@ int test_quaternions () {
     blank_quaternion(quat);
 
     assert(comp != quat, "Expected that quat and comp are distinct quaternions") ? pass_count++ : fail_count++;
-    assert(compare_quaternions(comp, quat) ==  1, "Expected that quat and comp are equal and distinct") ? pass_count++ : fail_count++;
-    assert(compare_quaternions(comp, comp) == -1, "Expected that comp being compared with itself would return -1") ? pass_count++ : fail_count++;
+    assert(compare_vectors(comp, quat) ==  1, "Expected that quat and comp are equal and distinct") ? pass_count++ : fail_count++;
+    assert(compare_vectors(comp, comp) == -1, "Expected that comp being compared with itself would return -1") ? pass_count++ : fail_count++;
 
     create_quaternion_components(-1, 0, 1, 2, quat);
     create_quaternion_components(-1, 0, 1, 2, comp);
 
-    assert(compare_quaternions(comp, quat) ==  1, "Expected that quat and comp are equal and distinct") ? pass_count++ : fail_count++;
-    assert(compare_quaternions(comp, comp) == -1, "Expected that comp being compared with itself would return -1") ? pass_count++ : fail_count++;
+    assert(compare_vectors(comp, quat) ==  1, "Expected that quat and comp are equal and distinct") ? pass_count++ : fail_count++;
+    assert(compare_vectors(comp, comp) == -1, "Expected that comp being compared with itself would return -1") ? pass_count++ : fail_count++;
 
     create_quaternion_components(1, 2, 3, 4, comp);
 
-    assert(compare_quaternions(comp, quat) ==  0, "Expected that quat and comp are unequal and distinct") ? pass_count++ : fail_count++;
+    assert(compare_vectors(comp, quat) ==  0, "Expected that quat and comp are unequal and distinct") ? pass_count++ : fail_count++;
 
-    assert(compare_quaternions(NULL, quat) ==  0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
-    assert(compare_quaternions(comp, NULL) ==  0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
-    assert(compare_quaternions(NULL, NULL) ==  0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
+    assert(compare_vectors(NULL, quat) ==  0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
+    assert(compare_vectors(comp, NULL) ==  0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
+    assert(compare_vectors(NULL, NULL) ==  0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
 
 
     //test clone_quaternion
     printf("----------  test clone_components  ----------\n");
     blank_quaternion(comp);
-    assert(compare_quaternions(quat, comp) == 0, "Expected quaternions to be distinct and unequal") ? pass_count++ : fail_count++;
-    clone_quaternion(quat, comp); //clone quat into comp
-    assert(compare_quaternions(quat, comp) == 1, "Expected quaternions to be distinct and equal") ? pass_count++ : fail_count++;
+    assert(compare_vectors(quat, comp) == 0, "Expected quaternions to be distinct and unequal") ? pass_count++ : fail_count++;
+    clone_vector(quat, comp); //clone quat into comp
+    assert(compare_vectors(quat, comp) == 1, "Expected quaternions to be distinct and equal") ? pass_count++ : fail_count++;
     assert(!neo, "Expected neo to be NULL") ? pass_count++ : fail_count++;
-    assert(compare_quaternions(quat, neo) == 0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
-    neo = clone_quaternion(quat, neo);
-    assert(compare_quaternions(quat, neo) == 1, "Expected quaternions to be distinct and equal") ? pass_count++ : fail_count++;
+    assert(compare_vectors(quat, neo) == 0, "Expected that a NULL comparison would fail") ? pass_count++ : fail_count++;
+    neo = clone_vector(quat, neo);
+    assert(compare_vectors(quat, neo) == 1, "Expected quaternions to be distinct and equal") ? pass_count++ : fail_count++;
 
     printf("----------  test magnitude_components  ----------\n");
     create_quaternion_components(3, 4, 0, 0, quat);
-    assert(magnitude_quaternion(quat) == 5, "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
+    assert(magnitude_vector(quat) == 5, "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
     create_quaternion_components(1, 1, 1, 1, quat);
-    assert(magnitude_quaternion(quat) == 2, "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
+    assert(magnitude_vector(quat) == 2, "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
     create_quaternion_components(2, 2, 2, 2, quat);
-    assert(magnitude_quaternion(quat) == 4, "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
+    assert(magnitude_vector(quat) == 4, "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
     create_quaternion_components(1, 2, 3, 4, quat);
-    assert(magnitude_quaternion(quat) == sqrt(30), "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
+    assert(magnitude_vector(quat) == sqrt(30), "Expected magnitude to equal 5") ? pass_count++ : fail_count++;
 
 
     printf("----------  test normalize_components  ----------\n");
     create_quaternion_components(3, 4, 0, 0, quat); //should create a magnitude 5 quaternion, as previously tested
-    normalize_quaternion(quat, comp); //copy a normalized version of quat into comp
+    normalize_vector(quat, comp); //copy a normalized version of quat into comp
 
-    assert(magnitude_quaternion(quat) == 5, "Expected quat to have a magnitude of 5") ? pass_count++ : fail_count++;
-    assert(magnitude_quaternion(comp) == 1, "Expected comp to have a magnitude of 1") ? pass_count++ : fail_count++;
+    assert(magnitude_vector(quat) == 5, "Expected quat to have a magnitude of 5") ? pass_count++ : fail_count++;
+    assert(magnitude_vector(comp) == 1, "Expected comp to have a magnitude of 1") ? pass_count++ : fail_count++;
     assert(dot_product(comp, quat) == 5, "Expected dot_product of comp and quat to equal 5") ? pass_count++ : fail_count++; //relies on dot_product working
     assert(approx(comp->x * 0.75, comp->w, -10), "Expected the ratio of components to be preserved") ? pass_count++ : fail_count++;
 
-    free_quaternion(comp);
-    free_quaternion(neo);
-    free_quaternion(quat);
+
+    printf("----------  test normalize_components  ----------\n");
+    vector *vec = quaternion_to_vector(quat, NULL);
+
+    free_vector(comp);
+    free_vector(neo);
+    free_vector(quat);
 
     printf("%d passed\n%d failed\n", pass_count, fail_count);
     return 1;

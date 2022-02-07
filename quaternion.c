@@ -4,10 +4,10 @@
 #include <math.h>
 #include "vector.h"
 
-#define w elements[0]
-#define x elements[1]
-#define y elements[2]
-#define z elements[3]
+#define x elements[0]
+#define y elements[1]
+#define z elements[2]
+#define w elements[3]
 
 static double square(double n)
 {
@@ -55,63 +55,26 @@ vector *create_quaternion_angle_axis ( double angle, vector *axis, vector *dest)
 	if( !axis )
 		return NULL;
 
-	dest = blank_quaternion(dest);
+	dest = vector_to_quaternion(axis, dest);
+    normalize_vector(dest, dest);
 
 	double sine = sin(angle/2);
-	vector *normal = normalize_vector(axis, NULL);
+
+    for(int i = 0; i < 3; i++)
+        dest->elements[i] = sine * dest->elements[i];
 
 	dest->w = cos(angle/2);
-	dest->x = sine * axis->elements[0];
-	dest->y = sine * axis->elements[1];
-	dest->z = sine * axis->elements[2];
-
-	free_vector(normal);
 
 	return dest;
 }
 
-/*
- * Creates a clone of a given quaternion
- * If dest is not NULL, the function will overwrite dest with a copy of quat
- * If dest is NULL, the function simply returns quat
- * If dest is an equivalent pointer to quat, the function simply returns quat
- */
-vector *clone_quaternion(vector *quat, vector *dest)
-{
-	if( !quat )
-		return NULL;
-
-	if( quat == dest )
-		return quat;
-
-	dest = create_quaternion_components(quat->w, quat->x, quat->y, quat->z, dest);
-	return dest;
-}
 
 //Frees the quaternion
 int free_quaternion (vector *quat)
 {
-	if( !quat )
-		return 0;
-
-	free(quat);
-	return 1;
+    free_vector(quat);
 }
 
-int compare_quaternions (vector *a, vector *b)
-{
-    if( !a || !b )
-        return 0; //return 0 for failure (may change to -2 in future)
-
-    if( a == b )
-        return -1; //return -1 for equivalent pointers
-
-    if( a->w == b->w && a->x == b->x && a->y == b->y && a->z == b->z )
-        return 1; //return 1 for equivalence of distinct quaternions
-
-    return 0; //return 0 for no equivalence
-
-}
 
 /*
  * Returns the given quaternion with the imaginary components negated
@@ -124,11 +87,10 @@ vector *inverse_quaternion(vector *quat, vector *dest)
     if( !quat )
         return NULL;
 
-	dest = clone_quaternion(quat, dest);
+	dest = clone_vector(quat, dest);
 
-	dest->x *= -1;
-	dest->y *= -1;
-	dest->z *= -1;
+    for(int i = 0; i < 3; i++)
+        dest->elements[i] *= -1;
 
 	return dest;
 }
@@ -152,52 +114,12 @@ vector *quaternion_to_vector (vector *quat, vector *dest)
 	if( !quat )
 		return NULL;
 
-	double* elements = malloc(3 * sizeof(double));
+    dest = create_vector(3, NULL, dest);
 
-	elements[0] = quat->x;
-	elements[1] = quat->y;
-	elements[2] = quat->z;
+    for(int i = 0; i < 3; i++)
+        dest->elements[i] = quat->elements[i];
 
-	dest = create_vector (3, elements, dest);
-	free(elements);
-	return dest;
-}
-
-/*
- * Returns the magnitude of the given quaternion
- * Domain of returned value ranges from 0 to +infinity
- * Returns -1 on failure
- */
-double magnitude_quaternion (vector *quat)
-{
-	if( !quat )
-		return -1;
-
-	return sqrt( square(quat->w) + square(quat->x) + square(quat->y) + square(quat->z) );
-}
-
-/*
- * Returns a normalized version of the quaternion quat
- * If dest is NULL, a new quaternion is allocated, overwritten with quat, and normalized
- * If dest is quat, quat will be normalized without allocating a new quaternion, and returned
- * if dest is neither, dest will be overwritten with quat, then normalized and returned
- */
-vector *normalize_quaternion (vector *quat, vector *dest)
-{
-	double mag = magnitude_quaternion(quat);
-
-    //if mag fails, fail here
-	if(mag == -1)
-		return NULL;
-
-	dest = clone_quaternion(quat, dest);
-
-	dest->w /= mag;
-	dest->x /= mag;
-	dest->y /= mag;
-	dest->z /= mag;
-
-	return dest;
+    return dest;
 }
 
 /*
@@ -226,7 +148,7 @@ vector *rotate_vector (vector *quat, vector *vec, vector *dest)
 
 	vector *inverse = inverse_quaternion(quat, inverse); //assign inverse
 	vector *vec_quat = vector_to_quaternion(vec, NULL); //create quaternion from vec
-    normalize_quaternion(vec_quat, vec_quat); //normalize
+    normalize_vector(vec_quat, vec_quat); //normalize
 
 	vector *inter  = multiply_quaternions(quat, vec_quat, NULL); //perform first multiplication
 	vector *result = multiply_quaternions(inter, inverse, NULL); //perform second multiplication

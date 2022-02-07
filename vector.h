@@ -8,6 +8,7 @@ typedef struct vector
 } vector;
 
 extern vector *create_vector(int count, const double *elements, vector *dest);
+extern vector *blank_vector (int count, vector *dest);
 extern int free_vector(struct vector* vec);
 extern double *read_vector(vector* vec, double *dest);
 extern int compare_vectors(vector *a, vector *b);
