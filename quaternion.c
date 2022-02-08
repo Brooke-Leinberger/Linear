@@ -105,6 +105,9 @@ vector *vector_to_quaternion (vector *vec, vector *dest)
 	if( !vec )
 		return NULL;
 
+    if( dest && dest->count != 4)
+        return NULL;
+
 	dest = create_quaternion_components(0, vec->elements[0], vec->elements[1], vec->elements[2], dest);
 	return dest;
 }
@@ -113,6 +116,9 @@ vector *quaternion_to_vector (vector *quat, vector *dest)
 {
 	if( !quat )
 		return NULL;
+
+    if( dest && dest->count != 3)
+        return NULL;
 
     dest = create_vector(3, NULL, dest);
 

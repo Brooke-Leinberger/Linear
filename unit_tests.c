@@ -270,7 +270,7 @@ int test_quaternions () {
     neo = NULL;
 
     //test create_quaternion_components
-    printf("----------  test create_blank_components  ----------\n");
+    printf("----------  test create_quaternion_components  ----------\n");
     create_quaternion_components(-1, 0, 1, 2, quat);
     assert(quat->w == -1, "Expected the real component to equal -1") ? pass_count++ : fail_count++;
     assert(quat->x ==  0, "Expected the x component to equal 0") ? pass_count++ : fail_count++;
@@ -333,12 +333,35 @@ int test_quaternions () {
     assert(approx(comp->x * 0.75, comp->w, -10), "Expected the ratio of components to be preserved") ? pass_count++ : fail_count++;
 
 
-    printf("----------  test normalize_components  ----------\n");
+    printf("----------  test quaternion_to_vector  ----------\n");
+    create_quaternion_components(0, -1, 0, 1, quat);
     vector *vec = quaternion_to_vector(quat, NULL);
+    assert(quat->x == vec->x, "Expected the x components to be equal") ? pass_count++ : fail_count++;
+    assert(quat->y == vec->y, "Expected the y components to be equal") ? pass_count++ : fail_count++;
+    assert(quat->z == vec->z, "Expected the z components to be equal") ? pass_count++ : fail_count++;
+    assert(!quaternion_to_vector(quat, comp), "Expected a return value of NULL for non-4D vector destination") ? pass_count++ : fail_count++;
+
+
+    printf("----------  test quaternion_to_vector  ----------\n");
+    vec->x = 3;
+    vec->y = 4;
+    vec->z = 5;
+    vector_to_quaternion(vec, quat);
+    create_quaternion_components(0, 3, 4, 5, comp);
+    assert(compare_vectors(quat, comp) == 1, "Expected quat and comp to be equal and distinct") ? pass_count++ : fail_count++;
+    assert(!vector_to_quaternion(quat, vec), "Expected a return value of NULL for non-3D vector destination") ? pass_count++ : fail_count++;
+
+
+    //printf("----------  test create_quaternion_angle_vector  ----------\n");
+    //printf("----------  test quaternion_to_matrix  ----------\n");
+    //printf("----------  test inverse_quaternion  ----------\n");
+    //printf("----------  test multiply_quaternions  ----------\n");
+
 
     free_vector(comp);
     free_vector(neo);
     free_vector(quat);
+    free_vector(vec);
 
     printf("%d passed\n%d failed\n", pass_count, fail_count);
     return 1;
